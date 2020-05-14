@@ -1,0 +1,6 @@
+
+*.config.js
+
+public/
+docs/
+src/**/iconfont.js

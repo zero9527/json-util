@@ -1,18 +1,20 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+    <div class="title">JSON-UTIL</div>
+    <JSON />
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import AsyncComponent from './components/AsyncComponent';
+
+const JSON = AsyncComponent(() => import('@/components/JSON-Util/index.vue'));
 
 export default Vue.extend({
   name: 'App',
   components: {
-    HelloWorld,
+    JSON,
   },
 });
 </script>
@@ -22,8 +24,20 @@ export default Vue.extend({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+
+.title {
+  padding: 10px 0;
+  font-size: 22px;
+  color: #2196f3;
+  text-align: center;
+  text-shadow: 1px 3px 4px rgba(33, 150, 243, 0.5);
 }
 </style>
