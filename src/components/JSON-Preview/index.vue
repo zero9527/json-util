@@ -3,31 +3,20 @@
     <div v-if="parseError" class="error">
       输入的格式不正确，无法解析！（去掉前后的引号试试）
     </div>
-    <div v-else>
-      <!-- 数组 -->
-      <section v-if="isArray(parsedJSON)">
-        <div>[</div>
-        <div v-for="(item, index) in parsedJSON" :key="index">
-          <render :data="item" />
-        </div>
-        <div>]</div>
-      </section>
-      <!-- 对象 -->
-      <section v-else-if="isObject(parsedJSON)">
-        <div>{</div>
-        <div v-for="(item, index) in parsedJSON" :key="index">
-          <render :data="item" />
-        </div>
-        <div>}</div>
-      </section>
-    </div>
+    <template v-else>
+      <Render
+        :data="parsedJSON"
+        @caretDownClick="caretDownClick"
+        @caretRightClick="caretRightClick"
+      />
+    </template>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed } from '@vue/composition-api';
+import { defineComponent, ref, watch } from '@vue/composition-api';
 import { isArray, isObject } from '@/utils';
-import render from './render.vue';
+import Render from './Render.vue';
 
 // 预览
 export default defineComponent({
@@ -36,18 +25,11 @@ export default defineComponent({
     inputJSON: String,
   },
   components: {
-    render,
+    Render,
   },
   setup(props) {
     const parsedJSON = ref<any[] | object>();
     const parseError = ref<any>(null);
-
-    watch(
-      () => props.inputJSON,
-      (val: string | undefined) => {
-        if (val) parseJson(val);
-      },
-    );
 
     // 输入JSON变化
     const parseJson = (val: string) => {
@@ -62,12 +44,30 @@ export default defineComponent({
       }
     };
 
+    watch(
+      () => props.inputJSON,
+      (val: string | undefined) => {
+        if (val) parseJson(val);
+      },
+    );
+
+    // 展开
+    const caretRightClick = (valueElement: any) => {
+      if (valueElement) valueElement.style.display = 'unset';
+    };
+
+    // 收起
+    const caretDownClick = (valueElement: any) => {
+      if (valueElement) valueElement.style.display = 'none';
+    };
+
     return {
       parsedJSON,
       parseError,
       isArray,
       isObject,
-      render,
+      caretDownClick,
+      caretRightClick,
     };
   },
 });
