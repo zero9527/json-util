@@ -1,8 +1,6 @@
 <template>
   <div class="preview">
-    <div v-if="parseError" class="error">
-      输入的格式不正确，无法解析！（去掉前后的引号试试）
-    </div>
+    <div v-if="parseError" class="error">输入的格式不正确，无法解析！（去掉前后的引号试试）</div>
     <template v-else>
       <Render
         :data="parsedJSON"
@@ -16,7 +14,7 @@
 <script lang="ts">
 import { defineComponent, ref, watch } from '@vue/composition-api';
 import { isArray, isObject } from '@/utils';
-import Render from './Render.vue';
+import Render from '../JSON-Render/index.vue';
 
 // 预览
 export default defineComponent({

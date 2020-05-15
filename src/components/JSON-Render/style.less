@@ -1,0 +1,66 @@
+.__item__ {
+  position: relative;
+  padding-left: 16px;
+
+  // &::before {
+  //   content: '';
+  //   width: 1px;
+  //   height: calc(100% - 20px);
+  //   display: block;
+  //   position: absolute;
+  //   margin-left: 8px;
+  //   margin-top: 20px;
+  //   background: #ccc;
+  // }
+
+  .__caret__ {
+    display: inline-flex;
+    align-items: center;
+
+    &.right {
+      display: none;
+    }
+
+    .icon {
+      line-height: 1;
+      padding-left: 2px;
+      margin-right: 4px;
+      font-size: 20px;
+
+      &:hover {
+        background: #eee;
+      }
+    }
+  }
+
+  .__key__ {
+    margin-right: 4px;
+    padding-left: 20px;
+    color: #ff5722;
+  }
+
+  .__value__ {
+    &.number {
+      color: #9c27b0;
+    }
+
+    &.string {
+      padding: 0 2px;
+
+      &::before {
+        content: '"';
+      }
+
+      &::after {
+        content: '"';
+      }
+    }
+
+    // .__content__ {
+    //   background: #f6f6f6;
+    // }
+  }
+}
+.__block__ {
+  display: block;
+}
