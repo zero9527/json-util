@@ -1,5 +1,5 @@
 <template>
-  <div>loading...</div>
+  <div class="loading">loading...</div>
 </template>
 
 <script>
@@ -8,4 +8,8 @@ export default {
 };
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.loading {
+  text-align: center;
+}
+</style>

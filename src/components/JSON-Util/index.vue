@@ -15,8 +15,6 @@ import { defineComponent, ref } from '@vue/composition-api';
 import DescComp from './Desc.vue';
 import Preview from '../JSON-Preview/index.vue';
 
-// [{"name": "a"}, {"name": "b"}]
-
 // JSON格式化
 export default defineComponent({
   name: 'JSON-Util',
