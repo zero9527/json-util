@@ -1,9 +1,15 @@
 <template>
   <div class="json-util">
-    <DescComp />
+    <div>
+      <DescComp />
+      <button @click="setJson('test')">test.json</button>&nbsp;
+      <button @click="setJson('test1')">test1.json</button>&nbsp;
+      <button @click="setJson('tsconfig')">tsconfig.json</button>&nbsp;
+      <button @click="setJson('package')">package.json</button>
+    </div>
     <main class="main">
       <section class="editor">
-        <textarea placeholder="输入json文本" @input="onInputChange" />
+        <textarea placeholder="输入json文本" ref="textareaRef" @input="onInputChange" />
       </section>
       <Preview :inputJSON="inputJSON" />
     </main>
@@ -23,7 +29,8 @@ export default defineComponent({
     Preview,
   },
   setup() {
-    const inputJSON = ref<any[] | object>();
+    const textareaRef = ref<any>(null);
+    const inputJSON = ref<string>();
 
     // 输入JSON变化
     const onInputChange = (e: any) => {
@@ -31,9 +38,18 @@ export default defineComponent({
       inputJSON.value = value;
     };
 
+    const setJson = async (name: string) => {
+      const { default: res } = await import(`../JSON-Files/${name}.json`);
+      const jsonString = JSON.stringify(res);
+      textareaRef.value.value = jsonString;
+      inputJSON.value = jsonString;
+    };
+
     return {
-      onInputChange,
+      textareaRef,
       inputJSON,
+      setJson,
+      onInputChange,
     };
   },
 });

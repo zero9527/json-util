@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="tooltip-wrapper"
-    :class="{ [wrapperClass]: Boolean(wrapperClass) }"
-  >
+  <div class="tooltip-wrapper" :class="{ [wrapperClass]: Boolean(wrapperClass) }">
     <slot name="default" />
     <section class="content">
       <slot name="content" />
@@ -71,6 +68,24 @@ export default defineComponent({
 
     li {
       line-height: 1.6;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .tooltip-wrapper {
+    .content {
+      max-width: 90vw;
+      left: 0;
+      right: 0;
+      top: 160%;
+      margin: auto;
+
+      &::before {
+        top: -10px;
+        left: 10px;
+        box-shadow: 8px -4px 12px -5px rgba(0, 0, 0, 0.2);
+      }
     }
   }
 }

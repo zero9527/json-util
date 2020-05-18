@@ -1,18 +1,19 @@
+@padding-left: 20px;
+
 .__item__ {
   position: relative;
-  padding-left: 16px;
+  padding-left: @padding-left;
 
-  // &::before {
-  //   content: '';
-  //   width: 1px;
-  //   height: calc(100% - 20px);
-  //   display: block;
-  //   position: absolute;
-  //   margin-left: 8px;
-  //   margin-top: 20px;
-  //   background: #ccc;
-  // }
+  &::before {
+    content: '';
+    width: 0;
+    height: 100%;
+    display: block;
+    position: absolute;
+    border-left: 1px dashed #cccccc;
+  }
 
+  // 收起、展开图标
   .__caret__ {
     display: inline-flex;
     align-items: center;
@@ -23,44 +24,70 @@
 
     .icon {
       line-height: 1;
-      padding-left: 2px;
       margin-right: 4px;
-      font-size: 20px;
+      vertical-align: middle;
 
       &:hover {
-        background: #eee;
+        background: #ccc;
       }
     }
   }
 
+  // key
   .__key__ {
-    margin-right: 4px;
-    padding-left: 20px;
-    color: #ff5722;
+    margin-right: 2px;
+    padding-left: @padding-left;
+    color: #9c27b0;
+
+    &::before {
+      content: '"';
+      color: initial;
+    }
+
+    &::after {
+      content: '"';
+      color: initial;
+    }
   }
 
   .__value__ {
-    &.number {
-      color: #9c27b0;
+    color: #666;
+  }
+
+  // 括号
+  .__brackets1__,
+  .__brackets2__,
+  .__caret__.right {
+    color: #9e9e9e;
+  }
+
+  // 类型
+  .number {
+    color: #9c27b0;
+  }
+
+  .boolean {
+    color: #076ec0;
+  }
+
+  .string {
+    padding: 0 2px;
+    color: #e91e63;
+
+    &::before {
+      content: '"';
+      color: initial;
     }
 
-    &.string {
-      padding: 0 2px;
-
-      &::before {
-        content: '"';
-      }
-
-      &::after {
-        content: '"';
-      }
+    &::after {
+      content: '"';
+      color: initial;
     }
-
-    // .__content__ {
-    //   background: #f6f6f6;
-    // }
   }
 }
+
 .__block__ {
   display: block;
+  position: relative;
+  line-height: 1.4;
 }

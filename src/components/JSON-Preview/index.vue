@@ -1,6 +1,8 @@
 <template>
   <div class="preview">
-    <div v-if="parseError" class="error">输入的格式不正确，无法解析！（去掉前后的引号试试）</div>
+    <div v-if="parseError" class="error">
+      输入的格式不正确，无法解析！（去掉前后的引号试试）
+    </div>
     <template v-else>
       <Render
         :data="parsedJSON"
@@ -50,12 +52,12 @@ export default defineComponent({
     );
 
     // 展开
-    const caretRightClick = (valueElement: any) => {
-      if (valueElement) valueElement.style.display = 'unset';
+    const caretRightClick = (valueElement: HTMLElement) => {
+      if (valueElement) valueElement.style.display = '';
     };
 
     // 收起
-    const caretDownClick = (valueElement: any) => {
+    const caretDownClick = (valueElement: HTMLElement) => {
       if (valueElement) valueElement.style.display = 'none';
     };
 

@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([["chunk-2d0d6bbc"],{"748a":function(n){n.exports=JSON.parse('{"name":"哈哈","age":22,"child":{"name":"小明","age":8},"sex":"男","son":[],"own":{}}')}}]);
