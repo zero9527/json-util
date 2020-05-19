@@ -1,8 +1,8 @@
-@padding-left: 20px;
+@margin-left: 20px;
 
 .__item__ {
   position: relative;
-  padding-left: @padding-left;
+  margin-left: @margin-left;
 
   &::before {
     content: '';
@@ -14,21 +14,22 @@
   }
 
   // 收起、展开图标
-  .__caret__ {
+  .__operate__ {
     display: inline-flex;
     align-items: center;
 
-    &.right {
+    &.fold {
       display: none;
     }
 
     .icon {
       line-height: 1;
+      padding: 0 2px;
       margin-right: 4px;
       vertical-align: middle;
 
       &:hover {
-        background: #ccc;
+        background: #e7e7e7;
       }
     }
   }
@@ -36,17 +37,14 @@
   // key
   .__key__ {
     margin-right: 2px;
-    padding-left: @padding-left;
+    margin-left: @margin-left;
     color: #9c27b0;
 
-    &::before {
-      content: '"';
-      color: initial;
-    }
-
+    &::before,
     &::after {
       content: '"';
-      color: initial;
+      // color: initial;
+      color: #999;
     }
   }
 
@@ -57,7 +55,7 @@
   // 括号
   .__brackets1__,
   .__brackets2__,
-  .__caret__.right {
+  .__operate__.fold {
     color: #9e9e9e;
   }
 
@@ -74,14 +72,11 @@
     padding: 0 2px;
     color: #e91e63;
 
-    &::before {
-      content: '"';
-      color: initial;
-    }
-
+    &::before,
     &::after {
       content: '"';
-      color: initial;
+      // color: initial;
+      color: #999;
     }
   }
 }
@@ -90,4 +85,15 @@
   display: block;
   position: relative;
   line-height: 1.4;
+
+  > .__brackets1__ {
+    padding-left: 20px;
+  }
+
+  // 括号
+  .__brackets1__,
+  .__brackets2__,
+  .__operate__.fold {
+    color: #9e9e9e;
+  }
 }

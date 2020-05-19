@@ -2,7 +2,6 @@
   <div class="json-util">
     <div>
       <DescComp />
-      <button @click="setJson('test')">test.json</button>&nbsp;
       <button @click="setJson('test1')">test1.json</button>&nbsp;
       <button @click="setJson('tsconfig')">tsconfig.json</button>&nbsp;
       <button @click="setJson('package')">package.json</button>

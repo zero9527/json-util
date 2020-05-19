@@ -40,4 +40,10 @@ body {
   text-align: center;
   text-shadow: 1px 3px 4px rgba(33, 150, 243, 0.5);
 }
+
+@media screen and (max-width: 600px) {
+  html {
+    font-size: 14px;
+  }
+}
 </style>

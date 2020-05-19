@@ -1,1 +1,29 @@
-{"name": "哈哈", "age": 22, "child": { "name": "小明", "age": 8 }, "sex": "男", "son": [], "own": {}}
+{
+  "name": "哈哈",
+  "age": 8,
+  "sex": "男",
+  "own": { "money": 6666 },
+  "friends": [
+    {
+      "name": "小明",
+      "age": 3,
+      "sex": "男",
+      "own": { "money": 233 },
+      "friends": [
+        { "name": "毛蛋", "age": 5, "sex": "男", "own": { "money": 233 } },
+        { "name": "铁柱", "age": 7, "sex": "男", "own": { "money": 888 } }
+      ]
+    },
+    {
+      "name": "二狗子",
+      "age": 6,
+      "sex": "男",
+      "own": { "money": 888 },
+      "friends": [
+        { "name": "小红", "age": 5, "sex": "女", "own": { "money": 233 } }
+      ]
+    }
+  ],
+  "class": [],
+  "other": {}
+}

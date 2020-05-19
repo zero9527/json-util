@@ -3,20 +3,34 @@ import { VNode } from 'vue';
 import { defineComponent } from '@vue/composition-api';
 import { isArray, isObject } from '@/utils';
 
+interface UtilProps {
+  parentData?: any;
+  data: object | string | any[];
+  dataIndex?: number;
+  utilLastOne: boolean; // 是否最后一个
+  pos?: string; // key在JSON中的位置
+}
+
 // 对象键值对
 interface RenderKeyValue {
-  lastOne: boolean;
+  lastOne: boolean; // 是否最后一个
   key: string;
   dataItem: any;
   value: (VNode | string)[];
 }
 
-// 括号收起状态
-interface BracketsRight {
-  brackets: '{}' | '[]';
-  lastOne: boolean;
+// 括号展开状态
+interface BracketsLeft {
+  showOperateIcon: boolean; // 显示加减号
+  keyType: 'array-key' | 'string-key';
   index?: number;
-  length?: number;
+}
+
+// 括号收起状态
+interface BracketsFold {
+  lastOne: boolean; // 是否最后一个
+  index?: number; // 对象在数组中的序号
+  length?: number; // 数组的长度
 }
 
 // 渲染逻辑
@@ -29,59 +43,58 @@ export default defineComponent({
   setup(props, ctx) {
     const h = ctx.root.$createElement;
 
-    // 点击"右"三角形：展开
-    const onCaretRigthClick = (e: any) => {
-      const caretRightElem = e.target.closest('.__caret__.right') as HTMLElement;
-      const brackets1Elem = caretRightElem.parentNode!.querySelector(
+    // 点击加号图标：展开
+    const onUnFoldClick = (e: any) => {
+      const iconFoldElem = e.target.closest('.__operate__.fold') as HTMLElement;
+      const brackets1Elem = iconFoldElem.parentNode!.querySelector(
         '.__value__ .__brackets1__',
       ) as HTMLElement;
-      const arrayItem = caretRightElem.getAttribute('type') === 'array';
-      // 普通key的对象
-      let valueElem = caretRightElem.parentElement!.querySelector(
-        arrayItem ? '.__item__' : '.__value__.object',
-      );
-      // 数组key的对象
-      if (!valueElem) {
-        valueElem = caretRightElem.parentElement!.querySelector('.__content__');
-      }
-      caretRightElem.style.display = 'none';
+      const arrayItem = iconFoldElem.getAttribute('type') === 'array';
+      const valueElem = Array.from(iconFoldElem.parentNode!.children).find(item => {
+        // __value__ object 普通key的对象；__content__ 数组key的对象
+        return arrayItem
+          ? item.className === '__item__'
+          : item.className === '__value__ object' || item.className === '__content__';
+      });
+      iconFoldElem.style.display = 'none';
       brackets1Elem.style.display = '';
-      ctx.emit('caretRightClick', valueElem);
+      ctx.emit('unFoldClick', valueElem);
     };
 
-    // 点击"下"三角形：收起
-    const onCaretDownClick = (e: any) => {
+    // 点击减号图标：收起
+    const onFoldClick = (e: any) => {
       const brackets1Elem = e.target.closest('.__brackets1__');
       const arrayItem = brackets1Elem.getAttribute('type') === 'array';
+      const arrayKey = brackets1Elem.getAttribute('keytype') === 'array-key';
       const valueElem = arrayItem ? brackets1Elem.nextSibling : brackets1Elem.parentNode;
-      // 右三角形
-      const caretRightElem = arrayItem
+      // 加号
+      const iconFoldElem = arrayItem
         ? brackets1Elem.previousSibling
         : valueElem.previousSibling;
 
-      brackets1Elem.style.display = 'none';
-      caretRightElem.style.display = 'inline-block';
+      if (!arrayKey) brackets1Elem.style.display = 'none';
+      iconFoldElem.style.display = 'inline-block';
       // 隐藏 value
-      ctx.emit('caretDownClick', valueElem);
+      ctx.emit('foldClick', valueElem);
     };
 
-    // 右三角：收起状态
-    const caretRight = h('icon-font', {
+    // 加号图标：收起状态
+    const iconFold = h('icon-font', {
       props: { icon: 'iconplus-square-o' },
       attrs: { title: '点击展开' },
-      nativeOn: { click: onCaretRigthClick },
+      nativeOn: { click: onUnFoldClick },
     });
 
-    // 下三角：展开状态
-    const caretDown = h('icon-font', {
+    // 减号图标：展开状态
+    const iconUnfold = h('icon-font', {
       props: { icon: 'iconminus-square-o' },
       attrs: { title: '点击收起' },
-      nativeOn: { click: onCaretDownClick },
+      nativeOn: { click: onFoldClick },
     });
 
-    const renderItem = (child: (VNode | string)[], bracketsRight?: VNode): VNode => {
+    const renderItem = (child: (VNode | string)[], bracketsFold?: VNode): VNode => {
       return h('div', { class: '__item__' }, [
-        bracketsRight || '',
+        bracketsFold || '', // 收起状态
         h('div', { class: '__content__' }, child),
       ]);
     };
@@ -89,21 +102,25 @@ export default defineComponent({
     const renderBlock = (child: (VNode | string)[]): VNode =>
       h('div', { class: '__block__' }, child);
 
-    const emptyBrakets = (brackets: '{}' | '{},' | '[]' | '[],') => {
+    // 空对象、空数组
+    const emptyBrakets = (brackets: '{}' | '{},' | '[]' | '[],'): VNode => {
       return h('span', { class: '__brackets1__ __brackets2__' }, brackets);
     };
 
     // 展开状态 -- 左括号
-    const bracketsDownStart = (brackets: '{' | '[', index?: number) => {
+    const bracketsLeft = (
+      brackets: '{' | '[',
+      { showOperateIcon, index, keyType }: BracketsLeft,
+    ): VNode => {
       const type = brackets === '{' ? 'object' : 'array';
-      return h('span', { class: '__brackets1__', attrs: { type } }, [
-        h('span', { class: '__caret__ down' }, [caretDown]),
+      return h('span', { class: '__brackets1__', attrs: { type, keyType } }, [
+        showOperateIcon ? h('span', { class: '__operate__ unfold' }, [iconUnfold]) : '',
         index !== undefined ? [`[${index}]: ${brackets}`] : brackets,
       ]);
     };
 
     // 展开状态 -- 右括号
-    const bracketsDownEnd = (brackets: '}' | ']', lastOne: boolean) => {
+    const bracketsRight = (brackets: '}' | ']', lastOne: boolean): VNode => {
       return h(
         'div',
         { class: '__brackets2__' },
@@ -112,36 +129,41 @@ export default defineComponent({
     };
 
     // 括号收起状态
-    const bracketsRight = ({ brackets, index, lastOne, length }: BracketsRight) => {
+    const bracketsFold = (
+      brackets: '{}' | '[]',
+      { index, lastOne, length }: BracketsFold,
+    ): VNode => {
       const type = brackets === '{}' ? 'object' : 'array';
       const [brackets1, brackets2] = brackets.split('');
       const _brackets2 = `${brackets2}${!lastOne ? ',' : ''}`;
       const node = [
-        caretRight,
+        iconFold,
         length !== undefined
           ? `[length: ${length}]: ${brackets1}...${_brackets2}`
           : index !== undefined
           ? `[${index}]: ${brackets1}...${_brackets2}`
           : `${brackets1}...${_brackets2}`,
       ];
-      return h('span', { class: '__caret__ right', attrs: { type } }, node);
+      return h('span', { class: '__operate__ fold', attrs: { type } }, node);
     };
 
     // 返回一个函数相当于 render
     return () => {
       if (!props.data) return h('');
 
-      const util = (
-        utilLastOne: boolean,
-        parentData: any,
-        data: object | string | any[],
-        dataIndex?: number,
-      ): (VNode | string)[] => {
+      // 统一处理逻辑
+      const util = ({
+        parentData,
+        data,
+        dataIndex,
+        utilLastOne,
+        pos,
+      }: UtilProps): (VNode | string)[] => {
         // 字符串
         if (typeof data === 'string') {
           return [
             renderItem([
-              h('span', { class: '__value__ string' }, `${data as string}`),
+              h('span', { class: '__value__ string' }, data as string),
               !utilLastOne ? ',' : '',
             ]),
           ];
@@ -152,10 +174,15 @@ export default defineComponent({
           return [
             renderItem(
               (data as any).map((item: any, index: number) =>
-                util(index === (data as any[]).length - 1, data, item, index),
+                util({
+                  parentData: data,
+                  data: item,
+                  dataIndex: index,
+                  utilLastOne: index === (data as any[]).length - 1,
+                  pos: `${pos}[${index}]`,
+                }),
               ),
-              bracketsRight({
-                brackets: '[]',
+              bracketsFold('[]', {
                 index: dataIndex,
                 lastOne: true,
                 length: (data as any[]).length,
@@ -175,17 +202,10 @@ export default defineComponent({
           dataItem,
         }: RenderKeyValue): VNode => {
           const emptyObject = isObject(dataItem) && !Object.keys(dataItem).length;
-          const dot = !lastOne && !isObject(dataItem) && !isArray(dataItem) && ',';
-          const arrayKey =
-            value.length > 1
-              ? bracketsRight({
-                  brackets: '{}',
-                  index: dataIndex,
-                  lastOne,
-                })
-              : '';
+          const comma = !lastOne && !isObject(dataItem) && !isArray(dataItem) && ',';
+          const arrayKey = value.length > 1 ? bracketsFold('{}', { lastOne }) : '';
           const node = [
-            h('span', { class: '__key__' }, key),
+            h('span', { class: '__key__', attrs: { title: `${pos}.${key}` } }, key),
             ': ',
             arrayKey,
             h(
@@ -193,7 +213,7 @@ export default defineComponent({
               { class: `__value__ ${isArray(dataItem) ? 'array' : typeof dataItem}` },
               emptyObject ? [!lastOne ? emptyBrakets('{},') : emptyBrakets('{}')] : value,
             ),
-            dot || '',
+            comma || '',
           ];
           return renderBlock(node);
         };
@@ -203,12 +223,19 @@ export default defineComponent({
         // 对象
         return [
           !isArray(parentData)
-            ? bracketsDownStart('{', isArray(parentData) ? dataIndex : undefined)
+            ? bracketsLeft('{', {
+                showOperateIcon: !!parentData,
+                keyType: 'string-key',
+              })
             : '',
           renderItem(
             [
               isArray(parentData)
-                ? bracketsDownStart('{', isArray(parentData) ? dataIndex : undefined)
+                ? bracketsLeft('{', {
+                    showOperateIcon: !!parentData,
+                    keyType: 'array-key',
+                    index: dataIndex,
+                  })
                 : '',
               ...dataKeys.map((key: string, index: number) => {
                 const lastOne = index === dataKeys.length - 1;
@@ -216,24 +243,27 @@ export default defineComponent({
                   isArray(dataObject[key as DataKey]) &&
                   (dataObject[key as DataKey] as any).length
                     ? [
-                        bracketsRight({
-                          brackets: '[]',
+                        bracketsFold('[]', {
                           lastOne,
                           length: (dataObject[key as DataKey] as any[]).length,
                         }),
-                        bracketsDownStart('['),
+                        bracketsLeft('[', {
+                          showOperateIcon: !!(dataObject[key as DataKey] as any),
+                          keyType: isArray(dataObject) ? 'array-key' : 'string-key',
+                        }),
                         renderItem([
-                          (dataObject[
-                            key as DataKey
-                          ] as any).map((item: any, i: number) =>
-                            util(
-                              index === (dataObject[key as DataKey] as any).length - 1,
-                              dataObject[key as DataKey],
-                              item,
-                              i,
-                            ),
+                          (dataObject[key as DataKey] as any).map(
+                            (item: any, i: number) =>
+                              util({
+                                parentData: dataObject[key as DataKey],
+                                data: item,
+                                dataIndex: i,
+                                utilLastOne:
+                                  i === (dataObject[key as DataKey] as any[]).length - 1,
+                                pos: `${pos}.${key}[${i}]`,
+                              }),
                           ),
-                          bracketsDownEnd(']', lastOne),
+                          bracketsRight(']', lastOne),
                         ]),
                       ]
                     : !lastOne
@@ -241,10 +271,14 @@ export default defineComponent({
                     : [emptyBrakets('[]')];
 
                 const objectValue = isObject(dataObject[key as DataKey])
-                  ? util(lastOne, dataObject, dataObject[key as DataKey], dataIndex)
-                  : !lastOne
-                  ? [emptyBrakets('{},')]
-                  : [emptyBrakets('{}')];
+                  ? util({
+                      parentData: dataObject,
+                      data: dataObject[key as DataKey],
+                      dataIndex,
+                      utilLastOne: lastOne,
+                      pos: `${pos}.${key}`,
+                    })
+                  : [''];
                 const value = isArray(dataObject[key as DataKey])
                   ? arrayValue
                   : isObject(data[key as DataKey])
@@ -257,10 +291,9 @@ export default defineComponent({
                   dataItem: data[key as DataKey],
                 });
               }),
-              bracketsDownEnd('}', utilLastOne),
+              bracketsRight('}', utilLastOne),
             ],
-            bracketsRight({
-              brackets: '{}',
+            bracketsFold('{}', {
               index: isArray(parentData) ? dataIndex : undefined,
               lastOne: utilLastOne,
             }),
@@ -271,16 +304,22 @@ export default defineComponent({
       // 数组
       if (isArray(props.data)) {
         return renderItem([
-          h('div', '['),
+          h('div', { class: '__brackets1__' }, '['),
           props.data.map((item: any, index: number) =>
-            util(index === props.data.length, props.data, item, index),
+            util({
+              parentData: props.data,
+              data: item,
+              dataIndex: index,
+              utilLastOne: index === props.data.length,
+              pos: `[][${index}]`,
+            }),
           ),
-          h('div', ']'),
+          h('div', { class: '__brackets2__' }, ']'),
         ]);
       }
 
       // 对象
-      return renderBlock(util(true, null, props.data));
+      return renderBlock(util({ data: props.data, utilLastOne: true, pos: '{}' }));
     };
   },
 });
