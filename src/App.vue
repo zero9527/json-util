@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import Vue from 'vue';
-import AsyncComponent from './components/AsyncComponent';
+import AsyncComponent from '@/components/AsyncComponent';
 
 const JSON = AsyncComponent(() => import('@/components/JSON-Util/index.vue'));
 

@@ -1,5 +1,7 @@
 <template>
-  <div class="loading">loading...</div>
+  <div class="loading">
+    <p>拼命加载中...</p>
+  </div>
 </template>
 
 <script>
@@ -10,6 +12,8 @@ export default {
 
 <style lang="less" scoped>
 .loading {
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

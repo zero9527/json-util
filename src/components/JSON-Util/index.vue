@@ -2,7 +2,9 @@
   <div class="json-util">
     <div>
       <DescComp />
-      <button @click="setJson('test1')">test1.json</button>&nbsp;
+      <button @click="setJson('vue_composition_api-package')">
+        vue_composition_api-package.json</button
+      >&nbsp; <button @click="setJson('test1')">test1.json</button>&nbsp;
       <button @click="setJson('tsconfig')">tsconfig.json</button>&nbsp;
       <button @click="setJson('package')">package.json</button>
     </div>

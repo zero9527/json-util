@@ -11,7 +11,7 @@ module.exports = {
     '@typescript-eslint/no-use-before-define': ['off'],
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/no-non-null-assertion': 'off',
-    'arrow-body-style': 'warn',
+    'arrow-body-style': 'off',
     'arrow-parens': 'off',
     'consistent-return': 'off',
     'function-paren-newline': 'off',

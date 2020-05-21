@@ -99,12 +99,19 @@ export default defineComponent({
       ]);
     };
 
-    const renderBlock = (child: (VNode | string)[]): VNode =>
-      h('div', { class: '__block__' }, child);
+    const renderBlock = (child: (VNode | string)[]): VNode => {
+      return h('div', { class: '__block__' }, child);
+    };
 
     // 空对象、空数组
     const emptyBrakets = (brackets: '{}' | '{},' | '[]' | '[],'): VNode => {
       return h('span', { class: '__brackets1__ __brackets2__' }, brackets);
+    };
+
+    // 引号
+    const valueWithQuote = (value: any): VNode[] => {
+      const quote = h('span', { class: '__quote__' }, '"');
+      return [quote, value, quote];
     };
 
     // 展开状态 -- 左括号
@@ -115,7 +122,7 @@ export default defineComponent({
       const type = brackets === '{' ? 'object' : 'array';
       return h('span', { class: '__brackets1__', attrs: { type, keyType } }, [
         showOperateIcon ? h('span', { class: '__operate__ unfold' }, [iconUnfold]) : '',
-        index !== undefined ? [`[${index}]: ${brackets}`] : brackets,
+        h('span', index !== undefined ? [`[${index}]: ${brackets}`] : brackets),
       ]);
     };
 
@@ -138,168 +145,177 @@ export default defineComponent({
       const _brackets2 = `${brackets2}${!lastOne ? ',' : ''}`;
       const node = [
         iconFold,
-        length !== undefined
-          ? `[length: ${length}]: ${brackets1}...${_brackets2}`
-          : index !== undefined
-          ? `[${index}]: ${brackets1}...${_brackets2}`
-          : `${brackets1}...${_brackets2}`,
+        h(
+          'span',
+          length !== undefined
+            ? `[length: ${length}]: ${brackets1}...${_brackets2}`
+            : index !== undefined
+            ? `[${index}]: ${brackets1}...${_brackets2}`
+            : `${brackets1}...${_brackets2}`,
+        ),
       ];
       return h('span', { class: '__operate__ fold', attrs: { type } }, node);
+    };
+
+    // 统一处理逻辑
+    const util = ({
+      parentData,
+      data,
+      dataIndex,
+      utilLastOne,
+      pos,
+    }: UtilProps): (VNode | string)[] => {
+      // 字符串
+      if (typeof data === 'string') {
+        return [
+          renderItem([
+            h('span', { class: '__value__ string' }, [valueWithQuote(data as string)]),
+            !utilLastOne ? ',' : '',
+          ]),
+        ];
+      }
+
+      // 数组
+      if (isArray(data)) {
+        return [
+          renderItem(
+            (data as any).map((item: any, index: number) =>
+              util({
+                parentData: data,
+                data: item,
+                dataIndex: index,
+                utilLastOne: index === (data as any[]).length - 1,
+                pos: `${pos}[${index}]`,
+              }),
+            ),
+            bracketsFold('[]', {
+              index: dataIndex,
+              lastOne: true,
+              length: (data as any[]).length,
+            }),
+          ),
+        ];
+      }
+
+      const dataKeys = Object.keys(data);
+      type DataKey = keyof typeof data;
+
+      // 对象键值对
+      const renderKeyValue = ({
+        key,
+        value,
+        lastOne,
+        dataItem,
+      }: RenderKeyValue): VNode => {
+        // 空对象
+        const emptyObject = isObject(dataItem) && !Object.keys(dataItem).length;
+        // 逗号
+        const comma = !lastOne && !isObject(dataItem) && !isArray(dataItem) && ',';
+        const arrayKey = value.length > 1 ? bracketsFold('{}', { lastOne }) : '';
+        const stringValue = typeof dataItem === 'string' && valueWithQuote(value);
+        const node = [
+          h('span', { class: '__key__', attrs: { title: `${pos}.${key}` } }, [
+            valueWithQuote(key),
+          ]),
+          ': ',
+          arrayKey,
+          h(
+            'span',
+            { class: `__value__ ${isArray(dataItem) ? 'array' : typeof dataItem}` },
+            emptyObject
+              ? [!lastOne ? emptyBrakets('{},') : emptyBrakets('{}')]
+              : [stringValue || value],
+          ),
+          comma || '',
+        ];
+        return renderBlock(node);
+      };
+
+      const dataObject = data as object;
+
+      // 对象
+      return [
+        !isArray(parentData)
+          ? bracketsLeft('{', {
+              showOperateIcon: !!parentData,
+              keyType: 'string-key',
+            })
+          : '',
+        renderItem(
+          [
+            isArray(parentData)
+              ? bracketsLeft('{', {
+                  showOperateIcon: !!parentData,
+                  keyType: 'array-key',
+                  index: dataIndex,
+                })
+              : '',
+            ...dataKeys.map((key: string, index: number) => {
+              const lastOne = index === dataKeys.length - 1;
+              const arrayValue =
+                isArray(dataObject[key as DataKey]) &&
+                (dataObject[key as DataKey] as any).length
+                  ? [
+                      bracketsFold('[]', {
+                        lastOne,
+                        length: (dataObject[key as DataKey] as any[]).length,
+                      }),
+                      bracketsLeft('[', {
+                        showOperateIcon: !!(dataObject[key as DataKey] as any),
+                        keyType: isArray(dataObject) ? 'array-key' : 'string-key',
+                      }),
+                      renderItem([
+                        (dataObject[key as DataKey] as any).map((item: any, i: number) =>
+                          util({
+                            parentData: dataObject[key as DataKey],
+                            data: item,
+                            dataIndex: i,
+                            utilLastOne:
+                              i === (dataObject[key as DataKey] as any[]).length - 1,
+                            pos: `${pos}.${key}[${i}]`,
+                          }),
+                        ),
+                        bracketsRight(']', lastOne),
+                      ]),
+                    ]
+                  : !lastOne
+                  ? [emptyBrakets('[],')]
+                  : [emptyBrakets('[]')];
+
+              const objectValue = isObject(dataObject[key as DataKey])
+                ? util({
+                    parentData: dataObject,
+                    data: dataObject[key as DataKey],
+                    dataIndex,
+                    utilLastOne: lastOne,
+                    pos: `${pos}.${key}`,
+                  })
+                : [''];
+              const value = isArray(dataObject[key as DataKey])
+                ? arrayValue
+                : isObject(data[key as DataKey])
+                ? objectValue
+                : [`${data[key as DataKey]}`];
+              return renderKeyValue({
+                key,
+                value,
+                lastOne,
+                dataItem: data[key as DataKey],
+              });
+            }),
+            bracketsRight('}', utilLastOne),
+          ],
+          bracketsFold('{}', {
+            index: isArray(parentData) ? dataIndex : undefined,
+            lastOne: utilLastOne,
+          }),
+        ),
+      ];
     };
 
     // 返回一个函数相当于 render
     return () => {
       if (!props.data) return h('');
-
-      // 统一处理逻辑
-      const util = ({
-        parentData,
-        data,
-        dataIndex,
-        utilLastOne,
-        pos,
-      }: UtilProps): (VNode | string)[] => {
-        // 字符串
-        if (typeof data === 'string') {
-          return [
-            renderItem([
-              h('span', { class: '__value__ string' }, data as string),
-              !utilLastOne ? ',' : '',
-            ]),
-          ];
-        }
-
-        // 数组
-        if (isArray(data)) {
-          return [
-            renderItem(
-              (data as any).map((item: any, index: number) =>
-                util({
-                  parentData: data,
-                  data: item,
-                  dataIndex: index,
-                  utilLastOne: index === (data as any[]).length - 1,
-                  pos: `${pos}[${index}]`,
-                }),
-              ),
-              bracketsFold('[]', {
-                index: dataIndex,
-                lastOne: true,
-                length: (data as any[]).length,
-              }),
-            ),
-          ];
-        }
-
-        const dataKeys = Object.keys(data);
-        type DataKey = keyof typeof data;
-
-        // 对象键值对
-        const renderKeyValue = ({
-          key,
-          value,
-          lastOne,
-          dataItem,
-        }: RenderKeyValue): VNode => {
-          const emptyObject = isObject(dataItem) && !Object.keys(dataItem).length;
-          const comma = !lastOne && !isObject(dataItem) && !isArray(dataItem) && ',';
-          const arrayKey = value.length > 1 ? bracketsFold('{}', { lastOne }) : '';
-          const node = [
-            h('span', { class: '__key__', attrs: { title: `${pos}.${key}` } }, key),
-            ': ',
-            arrayKey,
-            h(
-              'span',
-              { class: `__value__ ${isArray(dataItem) ? 'array' : typeof dataItem}` },
-              emptyObject ? [!lastOne ? emptyBrakets('{},') : emptyBrakets('{}')] : value,
-            ),
-            comma || '',
-          ];
-          return renderBlock(node);
-        };
-
-        const dataObject = data as object;
-
-        // 对象
-        return [
-          !isArray(parentData)
-            ? bracketsLeft('{', {
-                showOperateIcon: !!parentData,
-                keyType: 'string-key',
-              })
-            : '',
-          renderItem(
-            [
-              isArray(parentData)
-                ? bracketsLeft('{', {
-                    showOperateIcon: !!parentData,
-                    keyType: 'array-key',
-                    index: dataIndex,
-                  })
-                : '',
-              ...dataKeys.map((key: string, index: number) => {
-                const lastOne = index === dataKeys.length - 1;
-                const arrayValue =
-                  isArray(dataObject[key as DataKey]) &&
-                  (dataObject[key as DataKey] as any).length
-                    ? [
-                        bracketsFold('[]', {
-                          lastOne,
-                          length: (dataObject[key as DataKey] as any[]).length,
-                        }),
-                        bracketsLeft('[', {
-                          showOperateIcon: !!(dataObject[key as DataKey] as any),
-                          keyType: isArray(dataObject) ? 'array-key' : 'string-key',
-                        }),
-                        renderItem([
-                          (dataObject[key as DataKey] as any).map(
-                            (item: any, i: number) =>
-                              util({
-                                parentData: dataObject[key as DataKey],
-                                data: item,
-                                dataIndex: i,
-                                utilLastOne:
-                                  i === (dataObject[key as DataKey] as any[]).length - 1,
-                                pos: `${pos}.${key}[${i}]`,
-                              }),
-                          ),
-                          bracketsRight(']', lastOne),
-                        ]),
-                      ]
-                    : !lastOne
-                    ? [emptyBrakets('[],')]
-                    : [emptyBrakets('[]')];
-
-                const objectValue = isObject(dataObject[key as DataKey])
-                  ? util({
-                      parentData: dataObject,
-                      data: dataObject[key as DataKey],
-                      dataIndex,
-                      utilLastOne: lastOne,
-                      pos: `${pos}.${key}`,
-                    })
-                  : [''];
-                const value = isArray(dataObject[key as DataKey])
-                  ? arrayValue
-                  : isObject(data[key as DataKey])
-                  ? objectValue
-                  : [`${data[key as DataKey]}`];
-                return renderKeyValue({
-                  key,
-                  value,
-                  lastOne,
-                  dataItem: data[key as DataKey],
-                });
-              }),
-              bracketsRight('}', utilLastOne),
-            ],
-            bracketsFold('{}', {
-              index: isArray(parentData) ? dataIndex : undefined,
-              lastOne: utilLastOne,
-            }),
-          ),
-        ];
-      };
 
       // 数组
       if (isArray(props.data)) {
