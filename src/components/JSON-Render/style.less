@@ -1,4 +1,10 @@
 @margin-left: 20px;
+@color-key: #9c27b0;
+@color-value: #666;
+@color-number: #9c27b0;
+@color-boolean: #076ec0;
+@color-string: #e91e63;
+@color-quote: #999;
 
 .__item__ {
   position: relative;
@@ -27,6 +33,7 @@
       line-height: 1;
       padding: 0 2px;
       margin-right: 4px;
+      font-size: 18px;
       vertical-align: middle;
 
       &:hover {
@@ -39,46 +46,35 @@
   .__key__ {
     margin-right: 2px;
     margin-left: @margin-left;
-    color: #9c27b0;
+    color: @color-key;
 
     &:hover {
       background: #eee;
     }
   }
 
+  // value
   .__value__ {
-    color: #666;
+    color: @color-value;
   }
 
   // 引号
   .__quote__ {
-    color: #999;
-  }
-
-  // 括号
-  .__brackets1__,
-  .__brackets2__,
-  .__operate__.fold {
-    color: #9e9e9e;
-
-    > span {
-      line-height: 1;
-      vertical-align: middle;
-    }
+    color: @color-quote;
   }
 
   // 类型
   .number {
-    color: #9c27b0;
+    color: @color-number;
   }
 
   .boolean {
-    color: #076ec0;
+    color: @color-boolean;
   }
 
   .string {
     padding: 0 2px;
-    color: #e91e63;
+    color: @color-string;
   }
 }
 
@@ -98,11 +94,14 @@
   > .__brackets1__ {
     padding-left: 20px;
   }
+}
 
-  // 括号
-  .__brackets1__,
-  .__brackets2__,
-  .__operate__.fold {
-    color: #9e9e9e;
+// 括号
+.__brackets1__,
+.__brackets2__,
+.__operate__.fold {
+  > span {
+    line-height: 1;
+    vertical-align: middle;
   }
 }
