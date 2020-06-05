@@ -8,14 +8,7 @@
     <title><%= htmlWebpackPlugin.options.title %></title>
     <meta name="importmap-type" content="systemjs-importmap" />
     <script type="systemjs-importmap">
-      {
-        "imports": {
-          <% htmlWebpackPlugin.options.systemJsImportmap.forEach((item, index) => { %>
-            "<%= item.name %>": "<%= item.url %>"
-            <%= index !== htmlWebpackPlugin.options.systemJsImportmap.length - 1 ? ',' : '' %>
-          <% }) %>
-        }
-      }
+      <%= htmlWebpackPlugin.options.systemJsImportmap %>
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/system.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/systemjs/6.1.1/extras/amd.min.js"></script>

@@ -28,6 +28,43 @@ yarn add single-spa
 
 ### 1.2 配置
 #### 在 `HTML` 入口 
+> `systemjs-importmap` 也可以通过配置文件自动生成，这样也好区分开发环境跟生成环境不同的入口，注意打包后子应用的入口的跨域问题
+
+如下：
+
+```js
+// systemJs-Importmap.js
+const isEnvDev = process.env.NODE_ENV === 'development';
+
+// systemjs-importmap 的配置，通过webpack给html用
+module.exports = [
+  {
+    name: 'root-config',
+    entry: './js/app.js',
+  },
+  {
+    name: '@vue-mf/calendar',
+    entry: isEnvDev
+      ? '//localhost:2333/js/app.js'
+      : 'https://zero9527.github.io/vue-calendar/js/app.js', // 子应用的 hash
+  },
+];
+
+// vue.config.js
+chainWebpack: config => {
+  config.plugin('html').tap(args => {
+    const importMap = { imports: {} };
+    systemJsImportmap.forEach(item => (importMap.imports[item.name] = item.entry));
+    args[0].systemJsImportmap = JSON.stringify(importMap, null, 2);
+    return args;
+  });
+},
+
+// public\index.html
+<script type="systemjs-importmap">
+  <%= htmlWebpackPlugin.options.systemJsImportmap %>
+</script>
+```
 
 - 在 `public/index.html` 下添加
 
@@ -246,6 +283,8 @@ export default {
 ```
 
 #### 异步组件问题解决
+子项目添加如下设置
+
 ```js
 // src\set-public-path.ts
 import { setPublicPath } from 'systemjs-webpack-interop';

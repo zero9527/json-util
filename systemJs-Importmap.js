@@ -4,11 +4,11 @@ const isEnvDev = process.env.NODE_ENV === 'development';
 module.exports = [
   {
     name: 'root-config',
-    url: './js/app.js',
+    entry: './js/app.js',
   },
   {
     name: '@vue-mf/calendar',
-    url: isEnvDev
+    entry: isEnvDev
       ? '//localhost:2333/js/app.js'
       : 'https://zero9527.github.io/vue-calendar/js/app.js', // 子应用的 hash
   },

@@ -19,7 +19,9 @@ module.exports = {
   },
   chainWebpack: config => {
     config.plugin('html').tap(args => {
-      args[0].systemJsImportmap = systemJsImportmap;
+      const importMap = { imports: {} };
+      systemJsImportmap.forEach(item => (importMap.imports[item.name] = item.entry));
+      args[0].systemJsImportmap = JSON.stringify(importMap, null, 2);
       return args;
     });
   },
