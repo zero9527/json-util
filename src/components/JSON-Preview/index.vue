@@ -1,5 +1,5 @@
 <template>
-  <div class="preview">
+  <section class="preview">
     <div v-if="parseError" class="error">
       输入的格式不正确，无法解析！（去掉前后的引号试试）
       <p>{{ parseError }}</p>
@@ -8,7 +8,7 @@
     <template v-else>
       <Render :data="parsedJSON" @unFoldClick="onUnFoldClick" @foldClick="onFoldClick" />
     </template>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">

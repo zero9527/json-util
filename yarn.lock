@@ -913,6 +913,18 @@
   resolved "http://192.168.1.199:4873/@types%2fq/-/q-1.5.2.tgz#690a1475b84f2a884fd07cd797c00f5f31356ea8"
   integrity sha1-aQoUdbhPKohP0HzXl8APXzE1bqg=
 
+"@types/systemjs@^6.1.0":
+  version "6.1.0"
+  resolved "http://192.168.1.199:4873/@types%2fsystemjs/-/systemjs-6.1.0.tgz#eb92e3181391b6f49b8310077fe65bfa3db9392a"
+  integrity sha1-65LjGBORtvSbgxAHf+Zb+j25OSo=
+
+"@types/vue-router@^2.0.0":
+  version "2.0.0"
+  resolved "http://192.168.1.199:4873/@types%2fvue-router/-/vue-router-2.0.0.tgz#81094f2107e766a11b20af7fa0f34bec1f321e28"
+  integrity sha1-gQlPIQfnZqEbIK9/oPNL7B8yHig=
+  dependencies:
+    vue-router "*"
+
 "@types/webpack-env@^1.15.1":
   version "1.15.2"
   resolved "http://192.168.1.199:4873/@types%2fwebpack-env/-/webpack-env-1.15.2.tgz#927997342bb9f4a5185a86e6579a0a18afc33b0a"
@@ -7331,6 +7343,11 @@ simple-swizzle@^0.2.2:
   dependencies:
     is-arrayish "^0.3.1"
 
+single-spa@^5.5.3:
+  version "5.5.3"
+  resolved "http://192.168.1.199:4873/single-spa/-/single-spa-5.5.3.tgz#17c092120c7faf39bd740f95900f132150e17eb1"
+  integrity sha1-F8CSEgx/rzm9dA+VkA8TIVDhfrE=
+
 slash@^1.0.0:
   version "1.0.0"
   resolved "http://192.168.1.199:4873/slash/-/slash-1.0.0.tgz#c41f2f6c39fc16d1cd17ad4b5d896114ae470d55"
@@ -8345,6 +8362,11 @@ vue-loader@^15.9.1:
     loader-utils "^1.1.0"
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
+
+vue-router@*, vue-router@^3.3.2:
+  version "3.3.2"
+  resolved "http://192.168.1.199:4873/vue-router/-/vue-router-3.3.2.tgz#0099de402edb2fe92f9711053ab5a2156f239cad"
+  integrity sha1-AJneQC7bL+kvlxEFOrWiFW8jnK0=
 
 vue-style-loader@^4.1.0, vue-style-loader@^4.1.2:
   version "4.1.2"

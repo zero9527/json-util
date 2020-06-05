@@ -1,7 +1,8 @@
 <template>
-  <div id="app">
+  <div id="json-util">
     <div class="title">JSON-UTIL</div>
-    <JSON />
+    <div id="app-calendar"></div>
+    <JSONUtil />
   </div>
 </template>
 
@@ -9,18 +10,24 @@
 import Vue from 'vue';
 import AsyncComponent from '@/components/AsyncComponent';
 
-const JSON = AsyncComponent(() => import('@/components/JSON-Util/index.vue'));
+const JSONUtil = AsyncComponent(() =>
+  import(
+    /* webpackPrefetch: true */
+    /* webpackChunkName: 'json-util' */
+    '@/components/JSON-Util/index.vue'
+  ),
+);
 
 export default Vue.extend({
   name: 'App',
   components: {
-    JSON,
+    JSONUtil,
   },
 });
 </script>
 
 <style lang="less">
-#app {
+#json-util {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
