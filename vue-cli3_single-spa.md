@@ -188,6 +188,9 @@ yarn add single-spa-vue
 
 - 下载 `vue-cli-plugin-single-spa`
 
+解决这个问题
+> single-spa.min.js?25a2:2 single-spa minified message #37: See https://single-spa.js.org/error/?code=37&arg=application
+
 ```shell
 yarn add -D vue-cli-plugin-single-spa
 ```
