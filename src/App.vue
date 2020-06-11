@@ -2,7 +2,6 @@
   <div id="json-util">
     <div class="title">JSON-UTIL</div>
     <div id="app-calendar"></div>
-    <div id="app-clock"></div>
     <JSONUtil />
   </div>
 </template>

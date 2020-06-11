@@ -12,6 +12,7 @@
     "@vue/composition-api": "^0.5.0",
     "core-js": "^3.6.4",
     "single-spa": "^5.5.3",
+    "single-spa-vue": "^1.8.2",
     "vue": "^2.6.11",
     "vue-router": "^3.3.2"
   },

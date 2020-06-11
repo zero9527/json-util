@@ -1,12 +1,14 @@
 <template>
   <div class="json-util">
+    <div id="app-clock"></div>
     <div>
       <DescComp />
       <button @click="setJson('vue_composition_api-package')">
         vue_composition_api-package.json</button
       >&nbsp; <button @click="setJson('test1')">test1.json</button>&nbsp;
       <button @click="setJson('tsconfig')">tsconfig.json</button>&nbsp;
-      <button @click="setJson('package')">package.json</button>
+      <button @click="setJson('package')">package.json</button>&nbsp;
+      <router-link to="/sub-app">sub-app</router-link>
     </div>
     <main class="main">
       <section class="editor">
@@ -18,7 +20,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from '@vue/composition-api';
+import { defineComponent, ref, watch, onMounted } from '@vue/composition-api';
+import { mountParcel } from '@/main';
 import DescComp from './Desc.vue';
 import Preview from '../JSON-Preview/index.vue';
 
@@ -29,9 +32,32 @@ export default defineComponent({
     DescComp,
     Preview,
   },
-  setup() {
+  setup(props, ctx) {
     const textareaRef = ref<any>(null);
     const inputJSON = ref<string>();
+    const parcel = ref<any>(null);
+
+    const mountClockParcel = () => {
+      const routePath = ctx.root.$route.path;
+      const domElement = document.getElementById('app-clock');
+      if (routePath === '/sub-app' && domElement) {
+        const parcelConfig = (window as any).System.import('@vue-mf/clock');
+        parcel.value = mountParcel(parcelConfig, { domElement });
+      } else if (parcel.value) {
+        parcel.value.unmount();
+      }
+    };
+
+    onMounted(() => {
+      mountClockParcel();
+    });
+
+    watch(
+      () => ctx.root.$route.path,
+      () => {
+        mountClockParcel();
+      },
+    );
 
     // 输入JSON变化
     const onInputChange = (e: any) => {
