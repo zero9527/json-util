@@ -2,6 +2,10 @@
 node_modules
 /dist
 
+# zr-deploy 部署配置
+zr-deploy-config.json
+*.zip
+
 # local env files
 .env.local
 .env.*.local
