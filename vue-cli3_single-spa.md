@@ -204,7 +204,9 @@ import './single-spa-config';
 ### 1.3 Parcel 配置
 [官方文档](https://single-spa.js.org/docs/parcels-overview/)
 
-> 翻译过来叫：包裹，可以在主应用将一个子应用当做组件，手动挂载、卸载使用，不限框架，`webpack 5` 有一个 `Module Federation` 也是可以跨项目使用组件的
+> 翻译过来叫：包裹，可以在主应用将一个子应用当做组件，手动挂载、卸载使用，不限框架;
+
+> `webpack5(beta)` 有一个 `Module Federation` 的功能，可以跨项目使用组件的，更加细粒化
 
 #### 什么时候用
 把子应用当做一个组件使用，放在主应用的某个组件（A）下面时，`DOM` 节点不是一直存在的情况

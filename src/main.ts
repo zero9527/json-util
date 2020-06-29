@@ -1,11 +1,12 @@
-import './single-spa-config';
 import Vue from 'vue';
 import singleSpaVue from 'single-spa-vue';
 import VueCompositionApi from '@vue/composition-api';
+import singleSpaSetup from '@/single-spa-config';
 import Iconfont from '@/components/Iconfont/index.vue';
 import router from './router';
 import App from './App.vue';
 
+singleSpaSetup();
 Vue.use(VueCompositionApi);
 Vue.component('icon-font', Iconfont);
 

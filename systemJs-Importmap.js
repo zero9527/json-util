@@ -18,4 +18,10 @@ module.exports = [
       ? '//zero9527.site/vue-clock/js/app.js' // '//localhost:2334/js/app.js'
       : '//zero9527.site/vue-clock/js/app.js',
   },
+  {
+    name: '@react-mf/test',
+    entry: isEnvDev
+      ? '//localhost:2335/js/app.js'
+      : 'https://zero9527.github.io/clock/js/app.js',
+  },
 ];

@@ -1,33 +1,25 @@
 <template>
-  <div id="json-util">
+  <div id="app">
     <div class="title">JSON-UTIL</div>
-    <div id="app-calendar"></div>
-    <JSONUtil />
+    <router-view />
   </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue';
-import AsyncComponent from '@/components/AsyncComponent';
+import { defineComponent, onMounted } from '@vue/composition-api';
 
-const JSONUtil = AsyncComponent(() =>
-  import(
-    /* webpackPrefetch: true */
-    /* webpackChunkName: 'json-util' */
-    '@/components/JSON-Util/index.vue'
-  ),
-);
-
-export default Vue.extend({
+export default defineComponent({
   name: 'App',
-  components: {
-    JSONUtil,
+  setup() {
+    onMounted(() => {
+      console.log('App');
+    });
   },
 });
 </script>
 
 <style lang="less">
-#json-util {
+#app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
