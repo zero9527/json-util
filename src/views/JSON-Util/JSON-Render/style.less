@@ -8,12 +8,11 @@
 
 .__item__ {
   position: relative;
-  margin-left: @margin-left;
 
   &::before {
     content: '';
     width: 0;
-    height: calc(100% - 22px);
+    height: calc(100% - @margin-left);
     display: block;
     position: absolute;
     border-left: 1px dashed #cccccc;
@@ -45,7 +44,6 @@
   // key
   .__key__ {
     margin-right: 2px;
-    margin-left: @margin-left;
     color: @color-key;
 
     &:hover {
@@ -56,6 +54,7 @@
   // value
   .__value__ {
     color: @color-value;
+    word-break: break-all;
   }
 
   // 引号
@@ -79,6 +78,16 @@
 }
 
 .__content__ {
+  padding-left: @margin-left;
+
+  > .__brackets1__ {
+    margin-left: -@margin-left;
+  }
+
+  .__brackets2__ {
+    margin-left: -@margin-left;
+  }
+
   > .__item__ {
     &::before {
       top: 22px;
@@ -91,8 +100,13 @@
   position: relative;
   line-height: 1.4;
 
-  > .__brackets1__ {
-    padding-left: 20px;
+  .index {
+    user-select: none;
+  }
+
+  .type {
+    color: #999;
+    user-select: none;
   }
 }
 

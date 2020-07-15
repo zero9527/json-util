@@ -1,10 +1,29 @@
 .preview {
-  flex: 3;
-  padding: 16px;
+  height: 100%;
+  flex: auto;
+  display: flex;
+  flex-direction: column;
   border-left: 1px solid #eee;
   background: #f9f9f9;
   font-family: sans-serif;
-  overflow-y: auto;
+  overflow: hidden;
+
+  .key-pos {
+    padding: 16px;
+    padding-bottom: 6px;
+    word-break: break-all;
+    border-bottom: 1px solid #eee;
+  }
+
+  .content {
+    flex: 1 0 0;
+    overflow-x: auto;
+    overflow-y: auto;
+
+    > .__block__ {
+      padding: 16px;
+    }
+  }
 
   .loading {
     margin-top: 50px;
@@ -14,5 +33,16 @@
 
   .error {
     color: crimson;
+  }
+}
+
+@media screen and(max-width: 800px) {
+  .preview {
+    .content {
+      > .__block__ {
+        width: max-content;
+        max-width: 200%;
+      }
+    }
   }
 }

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { VNode } from 'vue';
-import { defineComponent } from '@vue/composition-api';
+import { defineComponent, onMounted } from '@vue/composition-api';
 import { isArray, isObject } from '@/utils';
 
 interface UtilProps {
@@ -24,6 +24,7 @@ interface BracketsLeft {
   showOperateIcon: boolean; // 显示加减号
   keyType: 'array-key' | 'string-key';
   index?: number;
+  keyPos?: string; // key的位置
 }
 
 // 括号收起状态
@@ -42,6 +43,38 @@ export default defineComponent({
   },
   setup(props, ctx) {
     const h = ctx.root.$createElement;
+
+    onMounted(() => {
+      const bracketsEls = document.querySelectorAll('.__brackets1__') as NodeListOf<
+        HTMLElement
+      >;
+      Array.from(bracketsEls).forEach(el => {
+        el.onmouseover = e => onBracketsHandler(e, 'over');
+        el.onmouseleave = e => onBracketsHandler(e, 'leave');
+      });
+
+      const keys = document.querySelectorAll('.__key__') as NodeListOf<HTMLElement>;
+      Array.from(keys).forEach(key => {
+        const title = key.getAttribute('title')!;
+        key.onmouseover = () => onKeyOver(title);
+      });
+    });
+
+    // 鼠标在 key 上停留
+    const onKeyOver = (title: string) => {
+      ctx.emit('onKeyOver', title);
+    };
+
+    // 鼠标进入/离开
+    const onBracketsHandler = (e: any, handle: 'over' | 'leave') => {
+      const bracketsLeft = e.target.closest('.__brackets1__');
+      const keyType = bracketsLeft.getAttribute('keytype');
+      const block = e.target.closest(
+        keyType === 'string-key' ? '.__block__' : '.__content__',
+      );
+      const bg = handle === 'over' ? '#eee' : '';
+      block.style.background = bg;
+    };
 
     // 点击加号图标：展开
     const onUnFoldClick = (e: any) => {
@@ -76,6 +109,13 @@ export default defineComponent({
       iconFoldElem.style.display = 'inline-block';
       // 隐藏 value
       ctx.emit('foldClick', valueElem);
+    };
+
+    // 首字母大写
+    const upperFirstWord = (type: string) => {
+      const arr = type.split('');
+      arr[0] = arr[0].toUpperCase();
+      return arr.join('');
     };
 
     // 加号图标：收起状态
@@ -117,20 +157,30 @@ export default defineComponent({
     // 展开状态 -- 左括号
     const bracketsLeft = (
       brackets: '{' | '[',
-      { showOperateIcon, index, keyType }: BracketsLeft,
+      { showOperateIcon, index, keyType, keyPos }: BracketsLeft,
     ): VNode => {
       const type = brackets === '{' ? 'object' : 'array';
-      return h('span', { class: '__brackets1__', attrs: { type, keyType } }, [
+      return h('span', { class: '__brackets1__', attrs: { type, keyType, keyPos } }, [
         showOperateIcon ? h('span', { class: '__operate__ unfold' }, [iconUnfold]) : '',
-        h('span', index !== undefined ? [`[${index}]: ${brackets}`] : brackets),
+        h('span', { class: 'type' }, upperFirstWord(type)),
+        h(
+          'span',
+          index !== undefined
+            ? [h('span', { class: 'index' }, ` [${index}]: `), ` ${brackets}`]
+            : [` ${brackets}`],
+        ),
       ]);
     };
 
     // 展开状态 -- 右括号
-    const bracketsRight = (brackets: '}' | ']', lastOne: boolean): VNode => {
+    const bracketsRight = (
+      brackets: '}' | ']',
+      lastOne: boolean,
+      keyPos?: string,
+    ): VNode => {
       return h(
         'div',
-        { class: '__brackets2__' },
+        { class: '__brackets2__', attrs: { keyPos } },
         !lastOne ? `${brackets},` : `${brackets}`,
       );
     };
@@ -145,13 +195,14 @@ export default defineComponent({
       const _brackets2 = `${brackets2}${!lastOne ? ',' : ''}`;
       const node = [
         iconFold,
+        h('span', { class: 'type' }, upperFirstWord(type)),
         h(
           'span',
           length !== undefined
-            ? `[length: ${length}]: ${brackets1}...${_brackets2}`
+            ? ` [length: ${length}]: ${brackets1}...${_brackets2}`
             : index !== undefined
-            ? `[${index}]: ${brackets1}...${_brackets2}`
-            : `${brackets1}...${_brackets2}`,
+            ? ` [${index}]: ${brackets1}...${_brackets2}`
+            : ` ${brackets1}...${_brackets2}`,
         ),
       ];
       return h('span', { class: '__operate__ fold', attrs: { type } }, node);
@@ -168,7 +219,7 @@ export default defineComponent({
       // 字符串
       if (typeof data === 'string') {
         return [
-          renderItem([
+          renderBlock([
             h('span', { class: '__value__ string' }, [valueWithQuote(data as string)]),
             !utilLastOne ? ',' : '',
           ]),
@@ -239,6 +290,7 @@ export default defineComponent({
           ? bracketsLeft('{', {
               showOperateIcon: !!parentData,
               keyType: 'string-key',
+              keyPos: `${pos}`,
             })
           : '',
         renderItem(
@@ -248,6 +300,7 @@ export default defineComponent({
                   showOperateIcon: !!parentData,
                   keyType: 'array-key',
                   index: dataIndex,
+                  keyPos: `${pos}`,
                 })
               : '',
             ...dataKeys.map((key: string, index: number) => {
@@ -263,6 +316,7 @@ export default defineComponent({
                       bracketsLeft('[', {
                         showOperateIcon: !!(dataObject[key as DataKey] as any),
                         keyType: isArray(dataObject) ? 'array-key' : 'string-key',
+                        keyPos: `${pos}.${key}`,
                       }),
                       renderItem([
                         (dataObject[key as DataKey] as any).map((item: any, i: number) =>
@@ -275,7 +329,7 @@ export default defineComponent({
                             pos: `${pos}.${key}[${i}]`,
                           }),
                         ),
-                        bracketsRight(']', lastOne),
+                        bracketsRight(']', lastOne, pos),
                       ]),
                     ]
                   : !lastOne
@@ -303,7 +357,7 @@ export default defineComponent({
                 dataItem: data[key as DataKey],
               });
             }),
-            bracketsRight('}', utilLastOne),
+            bracketsRight('}', utilLastOne, pos),
           ],
           bracketsFold('{}', {
             index: isArray(parentData) ? dataIndex : undefined,

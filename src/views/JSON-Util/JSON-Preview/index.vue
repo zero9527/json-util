@@ -1,14 +1,22 @@
 <template>
-  <section class="preview">
-    <div v-if="parseError" class="error">
-      输入的格式不正确，无法解析！（去掉前后的引号试试）
-      <p>{{ parseError }}</p>
-    </div>
-    <div class="loading" v-if="loading">正在解析...</div>
-    <template v-else>
-      <Render :data="parsedJSON" @unFoldClick="onUnFoldClick" @foldClick="onFoldClick" />
-    </template>
-  </section>
+  <div class="preview">
+    <div class="key-pos">keyPos: {{ keyPos }}</div>
+    <section class="content">
+      <div v-if="parseError" class="error">
+        输入的格式不正确，无法解析！（去掉前后的引号试试）
+        <p>{{ parseError }}</p>
+      </div>
+      <div class="loading" v-if="loading">正在解析...</div>
+      <template v-else>
+        <Render
+          :data="parsedJSON"
+          @unFoldClick="onUnFoldClick"
+          @foldClick="onFoldClick"
+          @onKeyOver="onKeyOver"
+        />
+      </template>
+    </section>
+  </div>
 </template>
 
 <script lang="ts">
@@ -36,6 +44,7 @@ export default defineComponent({
     const parsedJSON = ref<any[] | object>();
     const parseError = ref<any>(null);
     const loading = ref(false);
+    const keyPos = ref('');
 
     // 输入JSON变化
     const parseJson = (val: string) => {
@@ -72,14 +81,21 @@ export default defineComponent({
       if (valueElement) valueElement.style.display = 'none';
     };
 
+    // 鼠标在 key 上停留
+    const onKeyOver = (title: string) => {
+      keyPos.value = title;
+    };
+
     return {
       loading,
       parsedJSON,
       parseError,
       isArray,
       isObject,
+      keyPos,
       onUnFoldClick,
       onFoldClick,
+      onKeyOver,
     };
   },
 });
